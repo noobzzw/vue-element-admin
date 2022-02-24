@@ -30,7 +30,9 @@ const mutations = {
 
 const actions = {
   // user login
+  // {} 表示定义一个变量
   login({ commit }, userInfo) {
+    // 类似析构函数？
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {

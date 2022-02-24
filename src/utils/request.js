@@ -1,15 +1,17 @@
 /**
- * 封装axios
+ * 封装登录的axios
  */
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import qs from 'qs'
 
 // create an axios instance
 const service = axios.create({
   // url在.env里定义
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+  // baseURL: 'http://localhost:8080',
+  baseURL: '', // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
@@ -24,6 +26,18 @@ service.interceptors.request.use(
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
       config.headers['X-Token'] = getToken()
+    }
+    // post的RequestPayload格式转为formdata
+    // if (config.method === 'post') {
+    //   let data = ''
+    //   for (const item in config.data) {
+    //     if (config.data[item]) { data += encodeURIComponent(item) + '=' + encodeURIComponent(config.data[item]) + '&' }
+    //   }
+    //   config.data = data.slice(0, data.length - 1)
+    // }
+    if (config.method === 'post') {
+      // 如果为post则类型转换
+      config.data = qs.stringify(config.data)
     }
     return config
   },
@@ -48,7 +62,9 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-
+    console.log('response')
+    console.log(response)
+    console.log(res.code)
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 20000) {
       Message({
@@ -56,7 +72,6 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       })
-
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
         // to re-login

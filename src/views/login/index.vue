@@ -1,5 +1,6 @@
 <template>
   <div class="login-container">
+    <!-- model: 当前绑定的model;rules: 输入规则，提示用户 -->
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
@@ -10,6 +11,7 @@
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
+        <!-- autocomplete 是一个可带输入建议的输入框组件 -->
         <el-input
           ref="username"
           v-model="loginForm.username"
@@ -26,6 +28,8 @@
           <span class="svg-container">
             <svg-icon icon-class="password" />
           </span>
+          <!-- @keyup.native="checkCapslock" 检测输入是否合法 -->
+          <!-- key属性可以强制替换元素，这里用与调整输入框属性，完成是否显示密码 -->
           <el-input
             :key="passwordType"
             ref="password"
@@ -63,7 +67,8 @@
       </div>
     </el-form>
     <!-- :visible指的是属性绑定，表示弹框的显示隐藏，当:visible的值为ture的时候，弹框显示，当为false的时候，弹框隐藏 -->
-    <!-- 后面的.sync是什么意思呢，指的就是同步动态双向的来表示visible的值，当我们关闭窗口的时候，这个弹框隐藏了，visible的值发生了变化，但是关闭窗口这个动作，我们没法用确定的动作去判断这个值，所以用到了vue中的双向绑定的原则，在vue中统一加上了.sync来表示同步的修改了visible的值。 -->
+    <!-- 后面的.sync是什么意思呢，指的就是同步动态双向的来表示visible的值，当我们关闭窗口的时候，这个弹框隐藏了，
+    visible的值发生了变化，但是关闭窗口这个动作，我们没法用确定的动作去判断这个值，所以用到了vue中的双向绑定的原则，在vue中统一加上了.sync来表示同步的修改了visible的值。 -->
     <el-dialog title="Or connect with" :visible.sync="showDialog">
       Can not be simulated on local, so please combine you own business simulation! ! !
       <br>
@@ -78,10 +83,12 @@
 import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
 
+// 向外暴露成员
 export default {
   name: 'Login',
   components: { SocialSign },
   data() {
+    // 检测用户名密码是否符合要求
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
         callback(new Error('Please enter the correct user name'))
@@ -90,16 +97,16 @@ export default {
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+      if (value.length < 3) {
+        callback(new Error('The password can not be less than 3 digits'))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: 'zzw',
+        password: '0105'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -114,22 +121,28 @@ export default {
     }
   },
   watch: {
+    // 监听路由变化
     $route: {
       handler: function(route) {
+        // 取出route中的参数（使用query传参，query相当于get请求）
         const query = route.query
         if (query) {
           this.redirect = query.redirect
           this.otherQuery = this.getOtherQuery(query)
         }
       },
+      // immediate如果为true 代表如果在 wacth 里声明了之后，就会立即先去执行里面的handler方法
       immediate: true
     }
   },
   created() {
     // window.addEventListener('storage', this.afterQRScan)
   },
+  // 当vue完成绑定时调用
   mounted() {
+    // $refs: 持有已注册过ref的所有的子组件
     if (this.loginForm.username === '') {
+      // 如果username为空则聚焦该input框
       this.$refs.username.focus()
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
@@ -157,8 +170,10 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+          // 来调取store里的user.js的login方法
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
+              // push: 修改 url，完成跳转
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
             })
