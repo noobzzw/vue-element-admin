@@ -41,9 +41,10 @@ module.exports = {
         target: 'http://localhost:8081',
         changeOrigin: true,
         pathRewrite: {
-          ['^' + '']: ''
+          ['^' + process.env.VUE_APP_BASE_API]: ''
         }
       }
+
     }
     // 该配置会使接口走mock.js
     // before: require('./mock/mock-server.js')
@@ -56,7 +57,9 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
-    }
+    },
+    // debug
+    devtool: 'source-map'
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
@@ -98,7 +101,7 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()

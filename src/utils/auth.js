@@ -1,3 +1,4 @@
+// 获取用户登录的token
 import Cookies from 'js-cookie'
 
 const TokenKey = 'Admin-Token'

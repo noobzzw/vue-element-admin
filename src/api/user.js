@@ -3,7 +3,7 @@ import request from '@/utils/request'
 export function login(data) {
   console.log('login data: ', data)
   return request({
-    url: '/login',
+    url: '/api/login',
     method: 'post',
     data
   })
@@ -11,7 +11,7 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    url: '/vue-element-admin/user/info',
+    url: '/api/user/info',
     method: 'get',
     params: { token }
   })

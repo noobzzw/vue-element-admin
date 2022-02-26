@@ -60,6 +60,11 @@ export const constantRoutes = [
     component: () => import('@/views/login/auth-redirect'),
     hidden: true
   },
+  // // 所有未定义路由，全部重定向到404页
+  // {
+  //   path: '*',
+  //   redirect: '/404'
+  // },
   {
     path: '/404',
     component: () => import('@/views/error-page/404'),

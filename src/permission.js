@@ -18,9 +18,11 @@ router.beforeEach(async(to, from, next) => {
   document.title = getPageTitle(to.meta.title)
 
   // determine whether the user has logged in
+  // 通过 auth.js 中的 getToken 取得登录时发放的 token 信息
   const hasToken = getToken()
 
   if (hasToken) {
+    // 如果用户访问的还是登录页面，则直接跳转到首页
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
@@ -28,12 +30,14 @@ router.beforeEach(async(to, from, next) => {
     } else {
       // determine whether the user has obtained his permission roles through getInfo
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
+      // 如果有用户的信息，则对将要访问的路由放行
       if (hasRoles) {
         next()
       } else {
         try {
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
+          // await 操作符用于等待一个Promise 对象，异步执行
           const { roles } = await store.dispatch('user/getInfo')
 
           // generate accessible routes map based on roles
