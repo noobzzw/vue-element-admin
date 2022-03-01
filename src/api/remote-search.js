@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { getToken } from '@/utils/auth'
 
 export function searchUser(name) {
   return request({
@@ -8,10 +9,10 @@ export function searchUser(name) {
   })
 }
 
-export function transactionList(query) {
+export function transactionList() {
   return request({
-    url: '/vue-element-admin/transaction/list',
+    url: '/api/task/list',
     method: 'get',
-    params: query
+    params: { token: getToken() }
   })
 }
